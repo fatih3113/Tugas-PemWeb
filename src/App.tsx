@@ -56,7 +56,11 @@ function App() {
         {/* HERO */}
         <section id="hero" className="flex items-center justify-between py-16">
           <div className="w-1/2">
-            <h1 className="text-5xl font-bold text-red-900 mb-4">INVOVEST</h1>
+            <img
+              src="https://www.invofest-harkatnegeri.com/assets/text-image.png"
+              alt="INVOVEST"
+              className="w-72 mb-4"
+            />
             <p className="text-gray-600 mb-6">
               Invofest (Informatics Vocational Festival) adalah festival tahunan
               yang bertujuan untuk menginspirasi dan memberdayakan generasi muda
