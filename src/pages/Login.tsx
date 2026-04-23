@@ -1,17 +1,17 @@
 import { useForm } from "react-hook-form";
-import{z} from "zod";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Input from "../component/ui/Input"; // Pastikan path benar
-
+import { Link } from "react-router-dom"; // ✅ ini yang benar
+import Input from "../component/ui/Input";
 
 type FormData = {
-    username: string;
-    password: string;
+  username: string;
+  password: string;
 };
 
 const schema = z.object({
-  username: z.string().min(2, "Username Harus Di isi").max(100),
-  password: z.string().min(8, "Minimal 8 Carakter").max(100),
+  username: z.string().min(2, "Username harus diisi").max(100),
+  password: z.string().min(8, "Minimal 8 karakter").max(100),
 });
 
 export default function Login() {
@@ -19,7 +19,9 @@ export default function Login() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({resolver: zodResolver(schema)});
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
 
   const onSubmit = (data: FormData) => {
     console.log("Data Login:", data);
@@ -28,9 +30,11 @@ export default function Login() {
   return (
     <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow">
       <h1 className="text-2xl font-bold mb-6">Login</h1>
-      
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Input Username */}
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
+      >
         <Input
           label="Username"
           name="username"
@@ -38,11 +42,10 @@ export default function Login() {
           error={errors.username?.message}
         />
 
-        {/* Input Password (ditambah type="password") */}
         <Input
           label="Password"
           name="password"
-          type="password" // <--- Ini kunci agar jadi bintang-bintang
+          type="password"
           register={register}
           error={errors.password?.message}
         />
@@ -53,6 +56,14 @@ export default function Login() {
         >
           Login
         </button>
+
+        {/* ✅ FIX BAGIAN INI */}
+        <div className="text-sm text-center">
+          Belum punya akun?{" "}
+          <Link to="/register" className="text-blue-600 hover:underline">
+            Daftar sekarang
+          </Link>
+        </div>
       </form>
     </div>
   );
