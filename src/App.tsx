@@ -1,19 +1,41 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// pages
 import Beranda from "./pages/Beranda";
 import Seminar from "./pages/Seminar";
 import Competition from "./pages/Competition";
-import Login from "./pages/Login";
 import Talkshow from "./pages/Talkshow";
 import Workshop from "./pages/Workshop";
+import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dashboard from "./pages/dashboard/Dashboard";
+
+// dashboard pages
+import CategoryIndex from "./pages/Kategori/CategoryIndex";
+import CategoryCreate from "./pages/Kategori/CategoryCreate";
+
+//event
+import EventIndex from "./pages/event/EventIndex";
+import EventCreate from "./pages/event/EventCreate";
+
+//pembicara
+import PembicaraCreate from "./pages/pembicara/PembicaraCreate"; 
+import PembicaraIndex from "./pages/pembicara/PembicaraIndex";
+
+// layout
 import MainLayout from "./layout/MainLayout";
 import AuthLayout from "./layout/AuthLayout";
+import DashboardLayout from "./layout/DashboardLayout";
+
+// route
+import ProtectedRoute from "./route/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rute yang menggunakan Header & Footer */}
+
+        {/* ================= MAIN ================= */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Beranda />} />
           <Route path="/competition" element={<Competition />} />
@@ -22,11 +44,34 @@ function App() {
           <Route path="/talkshow" element={<Talkshow />} />
         </Route>
 
-        {/* Rute untuk Login & Register (Tanpa Header/Footer umum) */}
+        {/* ================= AUTH ================= */}
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Route>
+
+        {/* ================= PROTECTED ================= */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+
+            {/* Dashboard */}
+            <Route path="/dashboard" element={<Dashboard />} />
+
+            {/* Category */}
+            <Route path="/dashboard/category" element={<CategoryIndex />} />
+            <Route path="/dashboard/category/create" element={<CategoryCreate />} />
+
+            {/* Event */}
+            <Route path="/dashboard/event" element={<EventIndex />} />
+            <Route path="/dashboard/event/create" element={<EventCreate />} />
+
+            {/* Pembicara */}
+            <Route path="/dashboard/pembicara" element={<PembicaraIndex />} />
+            <Route path="/dashboard/pembicara/create" element={<PembicaraCreate />} />
+
+          </Route>
+        </Route>
+
       </Routes>
     </BrowserRouter>
   );

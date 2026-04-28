@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom"; // ✅ TAMBAH INI
+import { Link } from "react-router-dom";
 import Input from "../component/ui/Input";
 
 type FormData = {
@@ -37,11 +37,25 @@ export default function Register() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow">
-      <h1 className="text-2xl font-bold mb-6 text-center">Register</h1>
+    <div className="flex flex-col gap-7">
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        
+      {/* Header */}
+      <div className="flex flex-col gap-1">
+        <span className="flex items-center gap-1.5 text-[11px] font-semibold  uppercase text-[#7B1D3F]">
+          <span className="inline-block w-5 h-0.5 bg-[#7B1D3F] rounded-sm" />
+          Invofest 2025
+        </span>
+        <h1 className="text-[28px] font-bold text-[#1a0a10] tracking-tight leading-tight">
+          Buat Akun
+        </h1>
+        <p className="text-sm text-gray-400 mt-1">
+          Bergabung dan jadilah bagian dari festival inovasi
+        </p>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
+
         <Input
           label="Username"
           name="username"
@@ -57,38 +71,42 @@ export default function Register() {
           error={errors.email?.message}
         />
 
-        <Input
-          label="Password"
-          name="password"
-          type="password"
-          register={register}
-          error={errors.password?.message}
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Password"
+            name="password"
+            type="password"
+            register={register}
+            error={errors.password?.message}
+          />
+          <Input
+            label="Konfirmasi Password"
+            name="confirmPassword"
+            type="password"
+            register={register}
+            error={errors.confirmPassword?.message}
+          />
+        </div>
 
-        <Input
-          label="Confirm Password"
-          name="confirmPassword"
-          type="password"
-          register={register}
-          error={errors.confirmPassword?.message}
-        />
+        <p className="text-xs text-gray-400 -mt-1">
+          Minimal 8 karakter, kombinasikan huruf dan angka
+        </p>
 
         <button
           type="submit"
-          className="bg-red-600 text-white py-2 rounded hover:bg-blue-600 transition"
+          className="w-full bg-[#7B1D3F] hover:bg-[#9e2550] active:scale-[0.98] text-white font-semibold text-[15px] py-3 rounded-[10px] transition-all duration-200 tracking-tight mt-1"
         >
-          Register
+          Daftar Sekarang →
         </button>
-
-        {/* ✅ TAMBAHAN DI SINI */}
-        <div className="text-sm text-center mt-2">
-          Sudah punya akun?{" "}
-          <Link to="/login" className="text-blue-600 hover:underline">
-            Login sekarang
-          </Link>
-        </div>
-
       </form>
+
+      {/* Login link */}
+      <p className="text-sm text-center text-gray-500">
+        Sudah punya akun?{" "}
+        <Link to="/login" className="text-[#7B1D3F] font-semibold hover:underline">
+          Login sekarang
+        </Link>
+      </p>
     </div>
   );
 }
