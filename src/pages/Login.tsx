@@ -16,7 +16,6 @@ const schema = z.object({
 });
 
 export default function Login() {
-  // ❗ jangan pakai nama "Login" (bentrok dengan nama component)
   const login = useAuthStore((state) => state.login);
 
   const navigate = useNavigate();

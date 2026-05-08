@@ -14,7 +14,7 @@ function Avatar({ name }: { name: string }) {
     .toUpperCase();
 
   return (
-    <div className="w-8 h-8 rounded-full  from-[#7B1D3F] to-[#c9395e] text-white text-xs font-bold flex items-center justify-center ">
+    <div className="w-8 h-8 rounded-full text-white text-xs font-bold flex items-center justify-center bg-[#7B1D3F]">
       {initials}
     </div>
   );
@@ -46,12 +46,12 @@ export default function PembicaraIndex() {
         </Link>
       </div>
 
-      {/* TABLE CARD */}
+      {/* TABLE */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-100">
-              {["No", "Pembicara", "Pekerjaan", "Email", "Status", "Aksi"].map((h) => (
+              {["No", "Pembicara", "Pekerjaan", "Email", "Aksi"].map((h) => (
                 <th
                   key={h}
                   className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 px-4 py-2.5 text-left whitespace-nowrap"
@@ -73,7 +73,9 @@ export default function PembicaraIndex() {
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-2.5">
                     <Avatar name={item.name} />
-                    <span className="text-sm font-semibold text-[#1a0a10]">{item.name}</span>
+                    <span className="text-sm font-semibold text-[#1a0a10]">
+                      {item.name}
+                    </span>
                   </div>
                 </td>
 
@@ -83,18 +85,8 @@ export default function PembicaraIndex() {
                   </span>
                 </td>
 
-                <td className="px-4 py-3.5 text-xs text-gray-500">{item.email}</td>
-
-                <td className="px-4 py-3.5">
-                  <span
-                    className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                      item.status === "Aktif"
-                        ? "bg-emerald-50 text-emerald-700"
-                        : "bg-red-50 text-red-700"
-                    }`}
-                  >
-                    {item.status === "Aktif" ? "● Aktif" : "● Nonaktif"}
-                  </span>
+                <td className="px-4 py-3.5 text-xs text-gray-500">
+                  {item.email}
                 </td>
 
                 <td className="px-4 py-3.5">
@@ -113,7 +105,9 @@ export default function PembicaraIndex() {
         </table>
 
         <div className="px-4 py-3 border-t border-gray-50">
-          <span className="text-xs text-gray-300">Menampilkan {speakers.length} pembicara</span>
+          <span className="text-xs text-gray-300">
+            Menampilkan {speakers.length} pembicara
+          </span>
         </div>
       </div>
     </div>

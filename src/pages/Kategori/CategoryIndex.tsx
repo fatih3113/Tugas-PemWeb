@@ -3,29 +3,15 @@ import { Link } from "react-router-dom";
 type Category = {
   id: number;
   name: string;
-  status: "Aktif" | "Nonaktif";
 };
 
 const categories: Category[] = [
-  { id: 1, name: "Seminar", status: "Aktif" },
-  { id: 2, name: "Workshop", status: "Aktif" },
-  { id: 3, name: "Competition", status: "Nonaktif" },
+  { id: 1, name: "Seminar" },
+  { id: 2, name: "Workshop" },
+  { id: 3, name: "Competition" },
 ];
 
-const TABLE_HEADERS = ["No", "Nama Kategori", "Status", "Aksi"];
-
-function StatusBadge({ status }: { status: Category["status"] }) {
-  const isAktif = status === "Aktif";
-  return (
-    <span
-      className={`text-xs font-semibold px-3 py-1 rounded-full ${
-        isAktif ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
-      }`}
-    >
-      {isAktif ? "● Aktif" : "● Nonaktif"}
-    </span>
-  );
-}
+const TABLE_HEADERS = ["No", "Nama Kategori", "Aksi"];
 
 function CategoryRow({ item, index }: { item: Category; index: number }) {
   return (
@@ -34,10 +20,6 @@ function CategoryRow({ item, index }: { item: Category; index: number }) {
 
       <td className="px-4 py-3.5 text-sm font-semibold text-[#1a0a10]">
         {item.name}
-      </td>
-
-      <td className="px-4 py-3.5">
-        <StatusBadge status={item.status} />
       </td>
 
       <td className="px-4 py-3.5">
@@ -80,7 +62,7 @@ export default function CategoryIndex() {
         </Link>
       </div>
 
-      {/* TABLE CARD */}
+      {/* TABLE */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <table className="w-full border-collapse">
           <thead>

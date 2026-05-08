@@ -2,23 +2,15 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-type FormData = {
-  name: string;
-  category: string;
-  date: string;
-  location: string;
-  description: string;
-  status: string;
-};
-
 const schema = z.object({
   name: z.string().min(3, "Nama event minimal 3 karakter"),
   category: z.string().min(1, "Kategori wajib dipilih"),
   date: z.string().min(1, "Tanggal wajib diisi"),
   location: z.string().min(3, "Lokasi minimal 3 karakter"),
   description: z.string().min(5, "Deskripsi minimal 5 karakter"),
-  status: z.string().min(1, "Status wajib dipilih"),
 });
+
+type FormData = z.infer<typeof schema>;
 
 export default function EventCreate() {
   const {
@@ -39,7 +31,6 @@ export default function EventCreate() {
       <h1 className="text-2xl font-bold mb-4">Tambah Event</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-
         {/* Nama */}
         <input
           {...register("name")}
@@ -80,14 +71,6 @@ export default function EventCreate() {
           className="border p-2 rounded"
         />
         {errors.description && <p className="text-red-500">{errors.description.message}</p>}
-
-        {/* Status */}
-        <select {...register("status")} className="border p-2 rounded">
-          <option value="">Pilih Status</option>
-          <option value="active">Aktif</option>
-          <option value="inactive">Nonaktif</option>
-        </select>
-        {errors.status && <p className="text-red-500">{errors.status.message}</p>}
 
         <button className="bg-red-600 text-white py-2 rounded">
           Simpan Event
