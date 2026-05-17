@@ -1,131 +1,167 @@
 // src/controllers/pembicaraController.ts
 
 import type { Request, Response } from "express";
-import type { Pembicara } from "../types/pembicara";
-
-
-let pembicaraList: Pembicara[] = [];
-
+import { prisma } from "../lib/db.js";
 
 // 1. GET ALL
+export const getAllPembicara = async (req: Request, res: Response) => {
+  try {
+    const data = await prisma.pembicara.findMany({
+      orderBy: { id: "asc" },
+    });
 
-export const getAllPembicara = (req: Request, res: Response) => {
-  return res.json(pembicaraList);
-};
-
-
-// 2. GET BY ID
-
-export const getPembicaraById = (
-  req: Request<{ id: string }>,
-  res: Response
-) => {
-  const id = Number(req.params.id);
-
-  if (!Number.isInteger(id)) {
-    return res.status(400).json({ message: "ID tidak valid" });
-  }
-
-  const data = pembicaraList.find((p) => p.id === id);
-
-  if (!data) {
-    return res.status(404).json({ message: "Pembicara tidak ditemukan" });
-  }
-
-  return res.json(data);
-};
-
-
-// 3. CREATE
-
-export const createPembicara = (req: Request, res: Response) => {
-  const { name, pekerjaan, email, photo } = req.body as {
-    name?: string;
-    pekerjaan?: string;
-    email?: string;
-    photo?: string;
-  };
-
-  if (!name || !pekerjaan || !email || !photo) {
-    return res.status(400).json({
-      message: "Semua field wajib diisi",
+    return res.status(200).json({
+      message: "Berhasil mengambil data pembicara.",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Gagal mengambil data pembicara.",
+      error: error instanceof Error ? error.message : error,
     });
   }
-
-  const newData: Pembicara = {
-    id:
-      pembicaraList.length > 0
-        ? Math.max(...pembicaraList.map((p) => p.id)) + 1
-        : 1,
-    name,
-    pekerjaan,
-    email,
-    photo,
-  };
-
-  pembicaraList.push(newData);
-
-  return res.status(201).json(newData);
 };
 
+// 2. GET BY ID
+export const getPembicaraById = async (
+  req: Request<{ id: string }>,
+  res: Response
+) => {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id)) {
+    return res.status(400).json({ message: "ID tidak valid." });
+  }
+
+  try {
+    const data = await prisma.pembicara.findUnique({
+      where: { id },
+    });
+
+    if (!data) {
+      return res.status(404).json({ message: "Pembicara tidak ditemukan." });
+    }
+
+    return res.status(200).json({
+      message: "Berhasil mengambil data pembicara.",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Gagal mengambil data pembicara.",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+
+// 3. CREATE
+export const createPembicara = async (req: Request, res: Response) => {
+  try {
+    const { name, role, email, photo } = req.body as {
+      name?: string;
+      role?: string;
+      email?: string;
+      photo?: string;
+    };
+
+    if (!name || !role || !email || !photo) {
+      return res.status(400).json({ message: "Semua field wajib diisi." });
+    }
+
+    const newData = await prisma.pembicara.create({
+      data: { name, role, email, photo },
+    });
+
+    return res.status(201).json({
+      message: "Berhasil membuat pembicara.",
+      data: newData,
+    });
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      return res.status(409).json({ message: "Email sudah digunakan." });
+    }
+    return res.status(500).json({
+      message: "Gagal membuat pembicara.",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
 
 // 4. UPDATE
-
-export const updatePembicara = (
+export const updatePembicara = async (
   req: Request<{ id: string }>,
   res: Response
 ) => {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id)) {
-    return res.status(400).json({ message: "ID tidak valid" });
+    return res.status(400).json({ message: "ID tidak valid." });
   }
 
-  const data = pembicaraList.find((p) => p.id === id);
+  try {
+    const { name, role, email, photo } = req.body as {
+      name?: string;
+      role?: string;
+      email?: string;
+      photo?: string;
+    };
 
-  if (!data) {
-    return res.status(404).json({ message: "Pembicara tidak ditemukan" });
+    const updated = await prisma.pembicara.update({
+      where: { id },
+      data: {
+        ...(name !== undefined && { name }),
+        ...(role !== undefined && { role }),
+        ...(email !== undefined && { email }),
+        ...(photo !== undefined && { photo }),
+      },
+    });
+
+    return res.status(200).json({
+      message: "Berhasil memperbarui pembicara.",
+      data: updated,
+    });
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ message: "Pembicara tidak ditemukan." });
+    }
+    if (error.code === "P2002") {
+      return res.status(409).json({ message: "Email sudah digunakan." });
+    }
+    return res.status(500).json({
+      message: "Gagal memperbarui pembicara.",
+      error: error instanceof Error ? error.message : error,
+    });
   }
-
-  const { name, pekerjaan, email, photo } = req.body as {
-    name?: string;
-    pekerjaan?: string;
-    email?: string;
-    photo?: string;
-  };
-
-  if (name !== undefined) data.name = name;
-  if (pekerjaan !== undefined) data.pekerjaan = pekerjaan;
-  if (email !== undefined) data.email = email;
-  if (photo !== undefined) data.photo = photo;
-
-  return res.json(data);
 };
 
-
 // 5. DELETE
-
-export const deletePembicara = (
+export const deletePembicara = async (
   req: Request<{ id: string }>,
   res: Response
 ) => {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id)) {
-    return res.status(400).json({ message: "ID tidak valid" });
+    return res.status(400).json({ message: "ID tidak valid." });
   }
 
-  const index = pembicaraList.findIndex((p) => p.id === id);
+  try {
+    const deleted = await prisma.pembicara.delete({
+      where: { id },
+    });
 
-  if (index === -1) {
-    return res.status(404).json({ message: "Pembicara tidak ditemukan" });
+    return res.status(200).json({
+      message: "Pembicara berhasil dihapus.",
+      data: deleted,
+    });
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ message: "Pembicara tidak ditemukan." });
+    }
+    return res.status(500).json({
+      message: "Gagal menghapus pembicara.",
+      error: error instanceof Error ? error.message : error,
+    });
   }
-
-  const deleted = pembicaraList[index];
-  pembicaraList.splice(index, 1);
-
-  return res.json({
-    message: "Pembicara berhasil dihapus",
-    data: deleted,
-  });
+  //by fatih
 };

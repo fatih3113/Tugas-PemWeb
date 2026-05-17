@@ -1,38 +1,11 @@
-type Stat = {
-  title: string;
-  value: number;
-  icon: string;
-};
+// src/pages/dashboard/index.tsx
 
-type EventItem = {
-  name: string;
-  category: string;
-  date: string;
-};
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-type SpeakerItem = {
-  name: string;
-  job: string;
-};
-
-const stats: Stat[] = [
-  { title: "Kategori", value: 10, icon: "🗂️" },
-  { title: "Event", value: 25, icon: "📅" },
-  { title: "Pembicara", value: 8, icon: "🎤" },
-  { title: "Event Aktif", value: 5, icon: "✅" },
-];
-
-const latestEvents: EventItem[] = [
-  { name: "Seminar AI 2025", category: "Seminar", date: "10 Jan 2026" },
-  { name: "Workshop UI/UX", category: "Workshop", date: "15 Feb 2026" },
-  { name: "Talkshow Startup", category: "Talkshow", date: "20 Mar 2026" },
-];
-
-const latestSpeakers: SpeakerItem[] = [
-  { name: "Danang Avan M", job: "UI/UX Designer" },
-  { name: "Lhuqita Fazry", job: "Software Engineer" },
-  { name: "M. Dendi Purwanto", job: "Product Manager" },
-];
+type Stat = { title: string; value: number; icon: string };
+type EventItem = { id: number; name: string; category: { nama: string }; dateEvent: string };
+type SpeakerItem = { id: number; name: string; role: string; photo: string }; // ← tambah photo
 
 function StatCard({ stat }: { stat: Stat }) {
   return (
@@ -58,27 +31,43 @@ function SectionHeader({ title }: { title: string }) {
   );
 }
 
-function EventListItem({ item, isLast }: { item: EventItem; isLast: boolean }) {
-  return (
-    <li className={`flex items-center justify-between py-3 ${isLast ? "" : "border-b border-gray-50"}`}>
-      <div className="flex flex-col gap-0.5">
-        <span className="text-sm font-semibold text-[#1a0a10]">{item.name}</span>
-        <span className="text-xs text-gray-400">{item.date}</span>
-      </div>
-      <span className="text-xs font-medium bg-rose-50 text-[#7B1D3F] px-2.5 py-1 rounded-full">
-        {item.category}
-      </span>
-    </li>
-  );
-}
+export default function Dashboard() {
+  const [stats, setStats] = useState<Stat[]>([
+    { title: "Kategori", value: 0, icon: "🗂️" },
+    { title: "Event", value: 0, icon: "📅" },
+    { title: "Pembicara", value: 0, icon: "🎤" },
+  ]);
+  const [latestEvents, setLatestEvents] = useState<EventItem[]>([]);
+  const [latestSpeakers, setLatestSpeakers] = useState<SpeakerItem[]>([]);
 
-function SpeakerListItem({ item, index, isLast }: { item: SpeakerItem; index: number; isLast: boolean }) {
-  const initials = item.name
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        const [catRes, eventRes, speakerRes] = await Promise.all([
+          axios.get("http://localhost:3000/categories"),
+          axios.get("http://localhost:3000/events"),
+          axios.get("http://localhost:3000/pembicara"),
+        ]);
+
+        const categories = catRes.data.data;
+        const events = eventRes.data.data;
+        const speakers = speakerRes.data.data;
+
+        setStats([
+          { title: "Kategori", value: categories.length, icon: "🗂️" },
+          { title: "Event", value: events.length, icon: "📅" },
+          { title: "Pembicara", value: speakers.length, icon: "🎤" },
+        ]);
+
+        setLatestEvents(events.slice(0, 3));
+        setLatestSpeakers(speakers.slice(0, 3));
+      } catch {
+        alert("Gagal mengambil data dashboard.");
+      }
+    };
+
+    fetchAll();
+  }, []);
 
   const colors = [
     "from-[#7B1D3F] to-[#c9395e]",
@@ -86,20 +75,6 @@ function SpeakerListItem({ item, index, isLast }: { item: SpeakerItem; index: nu
     "from-[#1a7B3F] to-[#39c970]",
   ];
 
-  return (
-    <li className={`flex items-center gap-3 py-3 ${isLast ? "" : "border-b border-gray-50"}`}>
-      <div className={`w-9 h-9 rounded-full  ${colors[index % colors.length]} text-white text-xs font-bold flex items-center justify-center `}>
-        {initials}
-      </div>
-      <div className="flex flex-col gap-0.5">
-        <span className="text-sm font-semibold text-[#1a0a10]">{item.name}</span>
-        <span className="text-xs text-gray-400">{item.job}</span>
-      </div>
-    </li>
-  );
-}
-
-export default function Dashboard() {
   return (
     <div className="px-7 py-8 max-w-5xl mx-auto space-y-8">
 
@@ -116,7 +91,7 @@ export default function Dashboard() {
       </div>
 
       {/* STATS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {stats.map((stat) => (
           <StatCard key={stat.title} stat={stat} />
         ))}
@@ -130,27 +105,74 @@ export default function Dashboard() {
           <SectionHeader title="Event Terbaru" />
           <ul>
             {latestEvents.map((item, i) => (
-              <EventListItem
-                key={item.name}
-                item={item}
-                isLast={i === latestEvents.length - 1}
-              />
+              <li
+                key={item.id}
+                className={`flex items-center justify-between py-3 ${
+                  i === latestEvents.length - 1 ? "" : "border-b border-gray-50"
+                }`}
+              >
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-semibold text-[#1a0a10]">{item.name}</span>
+                  <span className="text-xs text-gray-400">
+                    {new Date(item.dateEvent).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </span>
+                </div>
+                <span className="text-xs font-medium bg-rose-50 text-[#7B1D3F] px-2.5 py-1 rounded-full">
+                  {item.category.nama}
+                </span>
+              </li>
             ))}
           </ul>
         </div>
 
-        {/* Pembicara Terbaru */}
+       {/* Pembicara Terbaru */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
           <SectionHeader title="Pembicara Terbaru" />
           <ul>
-            {latestSpeakers.map((item, i) => (
-              <SpeakerListItem
-                key={item.name}
-                item={item}
-                index={i}
-                isLast={i === latestSpeakers.length - 1}
-              />
-            ))}
+            {latestSpeakers.map((item, i) => {
+              const initials = item.name
+                .split(" ")
+                .map((n) => n[0])
+                .slice(0, 2)
+                .join("")
+                .toUpperCase();
+
+              return (
+                <li
+                  key={item.id}
+                  className={`flex items-center gap-3 py-3 ${
+                    i === latestSpeakers.length - 1 ? "" : "border-b border-gray-50"
+                  }`}
+                >
+                  {/* ← Ganti bagian avatar ini */}
+                  {item.photo ? (
+                    <img
+                      src={item.photo}
+                      alt={item.name}
+                      className="w-9 h-9 rounded-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <div
+                      className={`w-9 h-9 rounded-full bg-linear-to-br ${colors[i % colors.length]} text-white text-xs font-bold flex items-center justify-center`}
+                    >
+                      {initials}
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-sm font-semibold text-[#1a0a10]">{item.name}</span>
+                    <span className="text-xs text-gray-400">{item.role}</span>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </div>
 

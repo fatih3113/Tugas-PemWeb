@@ -1,14 +1,13 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 
-// ✅ schema (Tanpa Status)
 const schema = z.object({
   name: z.string().min(3, "Nama minimal 3 karakter"),
-  job: z.string().min(3, "Pekerjaan minimal 3 karakter"),
+  role: z.string().min(3, "Role minimal 3 karakter"),
   email: z.string().email("Email tidak valid"),
   photo: z.string().optional(),
-
 });
 
 type FormData = z.infer<typeof schema>;
@@ -17,14 +16,25 @@ export default function PembicaraCreate() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log("Pembicara:", data);
-    alert("Pembicara berhasil ditambahkan!");
+  const onSubmit = async (data: FormData) => {
+    try {
+      await axios.post("http://localhost:3000/pembicara", {
+        name: data.name,
+        role: data.role,
+        email: data.email,
+        photo: data.photo ?? "",
+      });
+      alert("Pembicara berhasil ditambahkan!");
+      reset();
+    } catch (error: any) {
+      alert(error.response?.data?.message ?? "Gagal menambahkan pembicara.");
+    }
   };
 
   return (
@@ -40,11 +50,11 @@ export default function PembicaraCreate() {
         {errors.name && <p className="text-red-500">{errors.name.message}</p>}
 
         <input
-          {...register("job")}
-          placeholder="Pekerjaan"
+          {...register("role")}
+          placeholder="Role / Jabatan"
           className="border p-2 rounded"
         />
-        {errors.job && <p className="text-red-500">{errors.job.message}</p>}
+        {errors.role && <p className="text-red-500">{errors.role.message}</p>}
 
         <input
           {...register("email")}
@@ -58,10 +68,16 @@ export default function PembicaraCreate() {
           placeholder="URL Foto"
           className="border p-2 rounded"
         />
-        <button className="bg-red-600 text-white py-2 rounded">
-          Simpan
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="bg-red-600 text-white py-2 rounded disabled:opacity-50"
+        >
+          {isSubmitting ? "Menyimpan..." : "Simpan"}
         </button>
       </form>
     </div>
   );
+  //by fatih
 }

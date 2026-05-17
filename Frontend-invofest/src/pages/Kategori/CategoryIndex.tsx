@@ -1,33 +1,45 @@
+// src/pages/dashboard/category/index.tsx
+
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 type Category = {
   id: number;
-  name: string;
+  nama: string;
 };
-
-const categories: Category[] = [
-  { id: 1, name: "Seminar" },
-  { id: 2, name: "Workshop" },
-  { id: 3, name: "Competition" },
-];
 
 const TABLE_HEADERS = ["No", "Nama Kategori", "Aksi"];
 
-function CategoryRow({ item, index }: { item: Category; index: number }) {
+function CategoryRow({
+  item,
+  index,
+  onDelete,
+}: {
+  item: Category;
+  index: number;
+  onDelete: (id: number) => void;
+}) {
   return (
     <tr className="border-b border-gray-50 hover:bg-rose-50/40 transition-colors">
       <td className="px-4 py-3.5 text-sm text-gray-300 w-10">{index + 1}</td>
 
       <td className="px-4 py-3.5 text-sm font-semibold text-[#1a0a10]">
-        {item.name}
+        {item.nama}
       </td>
 
       <td className="px-4 py-3.5">
         <div className="flex gap-2">
-          <button className="text-xs font-semibold px-3 py-1.5 rounded-md border border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors cursor-pointer">
+          <Link
+            to={`/dashboard/category/edit/${item.id}`}
+            className="text-xs font-semibold px-3 py-1.5 rounded-md border border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors"
+          >
             Edit
-          </button>
-          <button className="text-xs font-semibold px-3 py-1.5 rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors cursor-pointer">
+          </Link>
+          <button
+            onClick={() => onDelete(item.id)}
+            className="text-xs font-semibold px-3 py-1.5 rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors cursor-pointer"
+          >
             Hapus
           </button>
         </div>
@@ -37,6 +49,34 @@ function CategoryRow({ item, index }: { item: Category; index: number }) {
 }
 
 export default function CategoryIndex() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/categories");
+      setCategories(res.data.data);
+    } catch {
+      alert("Gagal mengambil data kategori.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Yakin ingin menghapus kategori ini?")) return;
+    try {
+      await axios.delete(`http://localhost:3000/categories/${id}`);
+      setCategories((prev) => prev.filter((c) => c.id !== id));
+    } catch {
+      alert("Gagal menghapus kategori.");
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
   return (
     <div className="px-7 py-8 max-w-5xl mx-auto">
 
@@ -79,14 +119,25 @@ export default function CategoryIndex() {
           </thead>
 
           <tbody>
-            {categories.map((item, index) => (
-              <CategoryRow key={item.id} item={item} index={index} />
-            ))}
+            {!loading &&
+              categories.map((item, index) => (
+                <CategoryRow
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  onDelete={handleDelete}
+                />
+              ))}
           </tbody>
         </table>
 
-        {/* Empty state */}
-        {categories.length === 0 && (
+        {loading && (
+          <div className="flex justify-center py-14">
+            <p className="text-sm text-gray-400">Memuat data...</p>
+          </div>
+        )}
+
+        {!loading && categories.length === 0 && (
           <div className="flex flex-col items-center justify-center py-14 gap-2">
             <span className="text-3xl">🗂️</span>
             <p className="text-sm text-gray-400 font-medium">Belum ada kategori</p>
@@ -102,4 +153,5 @@ export default function CategoryIndex() {
       </div>
     </div>
   );
+  //by fatih
 }

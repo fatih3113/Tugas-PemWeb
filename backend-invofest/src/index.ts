@@ -3,9 +3,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import eventRoutes from "./Routes/eventRoute";
-import categoryRoutes from "./Routes/categoryRoute";
-import pembicaraRoutes from "./Routes/pembicaraRoute";
+import eventRoutes from "./Routes/eventRoute.js";
+import categoryRoutes from "./Routes/categoryRoute.js";
+import pembicaraRoutes from "./Routes/pembicaraRoute.js";
 
 dotenv.config();
 
@@ -26,3 +26,4 @@ app.use("/pembicara", pembicaraRoutes);
 app.listen(PORT, () => {
   console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
 });
+//by fatih

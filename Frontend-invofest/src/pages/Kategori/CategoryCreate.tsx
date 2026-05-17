@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 
 const schema = z.object({
   name: z.string().min(3, "Nama kategori minimal 3 karakter"),
@@ -12,14 +13,22 @@ export default function CategoryCreate() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log("Data kategori:", data);
-    alert("Kategori berhasil dibuat!");
+  const onSubmit = async (data: FormData) => {
+    try {
+      await axios.post("http://localhost:3000/categories", {
+        nama: data.name,
+      });
+      alert("Kategori berhasil dibuat!");
+      reset();
+    } catch (error: any) {
+      alert(error.response?.data?.message ?? "Gagal membuat kategori.");
+    }
   };
 
   return (
@@ -45,11 +54,13 @@ export default function CategoryCreate() {
 
         <button
           type="submit"
-          className="bg-red-600 text-white py-2 rounded hover:bg-red-700 transition"
+          disabled={isSubmitting}
+          className="bg-red-600 text-white py-2 rounded hover:bg-red-700 transition disabled:opacity-50"
         >
-          Simpan Kategori
+          {isSubmitting ? "Menyimpan..." : "Simpan Kategori"}
         </button>
       </form>
     </div>
   );
+  //by fatih
 }

@@ -9,6 +9,12 @@ import Workshop from "./pages/Workshop";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/dashboard/Dashboard";
+// src/App.tsx atau router file
+
+import CategoryEdit from "./pages/Kategori/CategoryEdit";
+import PembicaraEdit from "./pages/pembicara/PembicaraEdit";
+import EventEdit from "./pages/event/EventEdit";
+
 
 // dashboard pages
 import CategoryIndex from "./pages/Kategori/CategoryIndex";
@@ -69,6 +75,11 @@ function App() {
             <Route path="/dashboard/pembicara" element={<PembicaraIndex />} />
             <Route path="/dashboard/pembicara/create" element={<PembicaraCreate />} />
 
+            {/* Untuk Edit */}
+            <Route path="/dashboard/category/edit/:id" element={<CategoryEdit />} />
+            <Route path="/dashboard/pembicara/edit/:id" element={<PembicaraEdit />} />
+            <Route path="/dashboard/event/edit/:id" element={<EventEdit />} />
+
           </Route>
         </Route>
 
@@ -76,5 +87,5 @@ function App() {
     </BrowserRouter>
   );
 }
-
+//by fatih
 export default App;
