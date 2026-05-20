@@ -8,14 +8,17 @@ datasource db {
 }
 
 model Event {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   location    String
-  dateEvent   DateTime @map("date_event")
+  dateEvent   DateTime  @map("date_event")
   description String
-  createdAt   DateTime @default(now()) @map("created_at")
-  categoryId  Int      @map("category_id")
-  category    Category @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime  @default(now()) @map("created_at")
+  categoryId  Int       @map("category_id")
+
+  pembicaraId Int?      @map("pembicara_id")
+  category    Category  @relation(fields: [categoryId], references: [id])
+  pembicara   Pembicara? @relation(fields: [pembicaraId], references: [id])
 
   @@map("events")
 }
@@ -29,11 +32,12 @@ model Category {
 }
 
 model Pembicara {
-  id    Int    @id @default(autoincrement())
-  name  String
-  role  String
-  email String @unique
-  photo String
+  id     Int     @id @default(autoincrement())
+  name   String
+  role   String
+  email  String  @unique
+  photo  String
+  events Event[]  // ← tambah
 
   @@map("pembicara")
 }
