@@ -1,3 +1,8 @@
+// ==========================================
+// CREATED BY FATIH MUBAROK
+// CLEAN MODERN PEMBICARA PAGE
+// ==========================================
+
 // src/pages/dashboard/pembicara/index.tsx
 
 import { Link } from "react-router-dom";
@@ -12,9 +17,13 @@ type Pembicara = {
   photo: string;
 };
 
-function Avatar({ name, photo }: { name: string; photo?: string }) {
-  const [imgError, setImgError] = useState(false);
-
+function Avatar({
+  name,
+  photo,
+}: {
+  name: string;
+  photo?: string;
+}) {
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -22,19 +31,18 @@ function Avatar({ name, photo }: { name: string; photo?: string }) {
     .join("")
     .toUpperCase();
 
-  if (photo && !imgError) {
+  if (photo) {
     return (
       <img
         src={photo}
         alt={name}
-        className="w-8 h-8 rounded-full object-cover"
-        onError={() => setImgError(true)}
+        className="w-12 h-12 rounded-2xl object-cover shadow-sm"
       />
     );
   }
 
   return (
-    <div className="w-8 h-8 rounded-full text-white text-xs font-bold flex items-center justify-center bg-[#7B1D3F]">
+    <div className="w-12 h-12 rounded-2xl bg-[#7B1D3F] text-white flex items-center justify-center font-bold shadow-sm">
       {initials}
     </div>
   );
@@ -57,9 +65,13 @@ export default function PembicaraIndex() {
 
   const handleDelete = async (id: number) => {
     if (!confirm("Yakin ingin menghapus pembicara ini?")) return;
+
     try {
       await axios.delete(`http://localhost:3000/pembicara/${id}`);
-      setSpeakers((prev) => prev.filter((p) => p.id !== id));
+
+      setSpeakers((prev) =>
+        prev.filter((item) => item.id !== id)
+      );
     } catch {
       alert("Gagal menghapus pembicara.");
     }
@@ -70,43 +82,56 @@ export default function PembicaraIndex() {
   }, []);
 
   return (
-    <div className="px-7 py-8 max-w-5xl mx-auto">
+    <div className="min-h-screen bg-[#f7f8fc] px-7 py-8">
 
-      {/* HEADER */}
-      <div className="flex justify-between items-start mb-7">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-4 h-0.5 bg-[#7B1D3F] rounded-full inline-block" />
-            <span className="text-[10px] font-semibold text-[#7B1D3F] tracking-widest uppercase">
-              Manajemen
+      {/* HERO */}
+      <div className="relative overflow-hidden rounded-3xl bg-white border border-gray-100 p-8 shadow-sm mb-7">
+
+        <div className="absolute top-0 right-0 w-52 h-52 bg-rose-50 rounded-full blur-3xl opacity-70" />
+
+        <div className="relative z-10 flex justify-between items-start flex-wrap gap-5">
+
+          <div>
+            <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase text-[#7B1D3F]">
+              <span className="w-2 h-2 rounded-full bg-[#7B1D3F]" />
+              Management
             </span>
-          </div>
-          <h1 className="text-2xl font-bold text-[#1a0a10] tracking-tight">Pembicara</h1>
-          <p className="text-sm text-gray-400 mt-1">Kelola pembicara event Invofest</p>
-        </div>
 
-        <Link
-          to="/dashboard/pembicara/create"
-          className="flex items-center gap-1.5 bg-[#7B1D3F] hover:bg-[#9e2550] text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
-        >
-          <span className="text-base leading-none">+</span>
-          Tambah Pembicara
-        </Link>
+            <h1 className="text-4xl font-black text-[#1a0a10] mt-3">
+              Pembicara Event
+            </h1>
+
+            <p className="text-sm text-gray-400 mt-3">
+              Kelola pembicara event Invofest dengan tampilan modern.
+            </p>
+          </div>
+
+          <Link
+            to="/dashboard/pembicara/create"
+            className="bg-[#7B1D3F] hover:bg-[#98234c] text-white px-5 py-3 rounded-2xl text-sm font-bold transition-all shadow-sm"
+          >
+            + Tambah Pembicara
+          </Link>
+        </div>
       </div>
 
       {/* TABLE */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <table className="w-full border-collapse">
+      <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
+
+        <table className="w-full">
+
           <thead>
             <tr className="bg-gray-50 border-b border-gray-100">
-              {["No", "Pembicara", "Role", "Email", "Aksi"].map((h) => (
-                <th
-                  key={h}
-                  className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 px-4 py-2.5 text-left whitespace-nowrap"
-                >
-                  {h}
-                </th>
-              ))}
+              {["No", "Pembicara", "Role", "Email", "Aksi"].map(
+                (item) => (
+                  <th
+                    key={item}
+                    className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400"
+                  >
+                    {item}
+                  </th>
+                )
+              )}
             </tr>
           </thead>
 
@@ -115,40 +140,57 @@ export default function PembicaraIndex() {
               speakers.map((item, index) => (
                 <tr
                   key={item.id}
-                  className="border-b border-gray-50 hover:bg-rose-50/40 transition-colors"
+                  className="group border-b border-gray-50 hover:bg-gray-50 transition-all duration-300"
                 >
-                  <td className="px-4 py-3.5 text-sm text-gray-300 w-10">{index + 1}</td>
 
-                  <td className="px-4 py-3.5">
-                    <div className="flex items-center gap-2.5">
-                      <Avatar name={item.name} photo={item.photo} />
-                      <span className="text-sm font-semibold text-[#1a0a10]">
-                        {item.name}
-                      </span>
+                  <td className="px-5 py-5 text-sm text-gray-300 font-mono">
+                    {String(index + 1).padStart(2, "0")}
+                  </td>
+
+                  <td className="px-5 py-5">
+                    <div className="flex items-center gap-4">
+                      <Avatar
+                        name={item.name}
+                        photo={item.photo}
+                      />
+
+                      <div>
+                        <h3 className="font-bold text-[#1a0a10]">
+                          {item.name}
+                        </h3>
+
+                        <p className="text-xs text-gray-400 mt-1">
+                          Speaker Invofest
+                        </p>
+                      </div>
                     </div>
                   </td>
 
-                  <td className="px-4 py-3.5">
-                    <span className="text-xs font-medium bg-rose-50 text-[#7B1D3F] px-2.5 py-1 rounded-full">
+                  <td className="px-5 py-5">
+                    <span className="text-xs font-semibold bg-rose-50 border border-rose-100 text-[#7B1D3F] px-3 py-1 rounded-full">
                       {item.role}
                     </span>
                   </td>
 
-                  <td className="px-4 py-3.5 text-xs text-gray-500">{item.email}</td>
+                  <td className="px-5 py-5 text-sm text-gray-500">
+                    {item.email}
+                  </td>
 
-                  <td className="px-4 py-3.5">
+                  <td className="px-5 py-5">
                     <div className="flex gap-2">
+
                       <Link
                         to={`/dashboard/pembicara/edit/${item.id}`}
-                        className="text-xs font-semibold px-3 py-1.5 rounded-md border border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors"
+                        className="px-4 py-2 text-xs font-semibold rounded-xl bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 transition-all"
                       >
-                        Edit
+                        ✏️ Edit
                       </Link>
+
                       <button
                         onClick={() => handleDelete(item.id)}
-                        className="text-xs font-semibold px-3 py-1.5 rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors cursor-pointer"
+                        className="px-4 py-2 text-xs font-semibold rounded-xl bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 transition-all cursor-pointer"
                       >
-                        Hapus
+                        🗑️ Hapus
                       </button>
                     </div>
                   </td>
@@ -158,26 +200,17 @@ export default function PembicaraIndex() {
         </table>
 
         {loading && (
-          <div className="flex justify-center py-14">
-            <p className="text-sm text-gray-400">Memuat data...</p>
+          <div className="flex justify-center py-20">
+            <p className="text-sm text-gray-400">
+              Memuat data...
+            </p>
           </div>
         )}
-
-        {!loading && speakers.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-14 gap-2">
-            <span className="text-3xl">🎤</span>
-            <p className="text-sm text-gray-400 font-medium">Belum ada pembicara</p>
-            <p className="text-xs text-gray-300">Tambah pembicara pertama kamu</p>
-          </div>
-        )}
-
-        <div className="px-4 py-3 border-t border-gray-50">
-          <span className="text-xs text-gray-300">
-            Menampilkan {speakers.length} pembicara
-          </span>
-        </div>
       </div>
     </div>
   );
-  //by fatih
 }
+
+// ==========================================
+// CREATED BY FATIH MUBAROK
+// ==========================================

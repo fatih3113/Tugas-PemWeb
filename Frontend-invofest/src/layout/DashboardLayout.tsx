@@ -1,9 +1,24 @@
-import { Outlet, Link, useNavigate } from "react-router-dom";
+// ==========================================
+// CREATED BY FATIH MUBAROK
+// CLEAN MODERN DASHBOARD LAYOUT
+// ==========================================
+
+// src/layouts/DashboardLayout.tsx
+
+import {
+  Outlet,
+  Link,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+
 import { useAuthStore } from "../store/useAuthStore";
 
 export default function DashboardLayout() {
   const logout = useAuthStore((state) => state.logout);
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -11,69 +26,169 @@ export default function DashboardLayout() {
     navigate("/login");
   };
 
+  const menus = [
+    {
+      name: "Dashboard",
+      path: "/dashboard",
+      icon: "🏠",
+    },
+    {
+      name: "Category Event",
+      path: "/dashboard/category",
+      icon: "🗂️",
+    },
+    {
+      name: "Event",
+      path: "/dashboard/event",
+      icon: "📅",
+    },
+    {
+      name: "Pembicara",
+      path: "/dashboard/pembicara",
+      icon: "🎤",
+    },
+  ];
+
   return (
-    <div className="flex w-full h-screen bg-gray-100">
-      
+    <div className="flex h-screen bg-[#f7f8fc] overflow-hidden">
+
       {/* SIDEBAR */}
-      <aside className="w-64 bg-[#7A1C3D] text-white flex flex-col justify-between shadow-lg">
-        
-        {/* LOGO */}
-        <div className="h-16 flex items-center justify-center border-b border-white/20">
-          <h2 className="text-xl font-bold tracking-wide">
-            INVOFEST
-          </h2>
+      <aside className="w-72 bg-white border-r border-gray-100 flex flex-col justify-between shadow-sm">
+
+        {/* TOP */}
+        <div>
+
+          {/* LOGO */}
+          <div className="h-24 px-7 flex items-center border-b border-gray-100">
+
+            <div className="flex items-center gap-4">
+
+              <div className="w-14 h-14 rounded-2xl bg-[#7B1D3F] text-white flex items-center justify-center text-xl font-black shadow-sm">
+                I
+              </div>
+
+              <div>
+                <h1 className="text-2xl font-black text-[#1a0a10] tracking-tight">
+                  INVOFEST
+                </h1>
+
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Event Management System
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* MENU */}
+          <div className="px-4 py-6">
+
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 px-4 mb-4">
+              Main Menu
+            </p>
+
+            <nav className="flex flex-col gap-2">
+
+              {menus.map((menu) => {
+                const isActive =
+                  location.pathname === menu.path;
+
+                return (
+                  <Link
+                    key={menu.path}
+                    to={menu.path}
+                    className={`group flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-300
+                      
+                      ${
+                        isActive
+                          ? "bg-[#7B1D3F] text-white shadow-sm"
+                          : "text-gray-600 hover:bg-gray-100"
+                      }
+                    `}
+                  >
+
+                    {/* ICON */}
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-all
+                        
+                        ${
+                          isActive
+                            ? "bg-white/15"
+                            : "bg-gray-100 group-hover:bg-white"
+                        }
+                      `}
+                    >
+                      {menu.icon}
+                    </div>
+
+                    {/* TEXT */}
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold">
+                        {menu.name}
+                      </span>
+
+                      <span
+                        className={`text-[11px]
+                          
+                          ${
+                            isActive
+                              ? "text-white/70"
+                              : "text-gray-400"
+                          }
+                        `}
+                      >
+                        Manage data
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
         </div>
 
-        {/* MENU */}
-        <nav className="flex flex-col gap-2 p-4 text-sm">
+        {/* BOTTOM */}
+        <div className="p-4 border-t border-gray-100">
 
-          <Link
-            to="/dashboard"
-            className="px-4 py-2 rounded-lg hover:bg-[#5C142E] transition"
-          >
-            Dashboard
-          </Link>
+          {/* PROFILE */}
+          <div className="flex items-center gap-3 bg-gray-50 rounded-2xl p-4 mb-4">
 
-          <Link
-            to="/dashboard/category"
-            className="px-4 py-2 rounded-lg hover:bg-[#5C142E] transition"
-          >
-            Category Event
-          </Link>
+            <div className="w-12 h-12 rounded-2xl bg-[#7B1D3F] text-white flex items-center justify-center font-bold shadow-sm">
+              F
+            </div>
 
-          <Link
-            to="/dashboard/event"
-            className="px-4 py-2 rounded-lg hover:bg-[#5C142E] transition"
-          >
-            Event
-          </Link>
+            <div>
+              <h3 className="text-sm font-bold text-[#1a0a10]">
+                Fatih Mubarok
+              </h3>
 
-          <Link
-            to="/dashboard/pembicara"
-            className="px-4 py-2 rounded-lg hover:bg-[#5C142E] transition"
-          >
-            Pembicara
-          </Link>
+              <p className="text-xs text-gray-400">
+                Administrator
+              </p>
+            </div>
+          </div>
 
-        </nav>
-
-        {/* LOGOUT */}
-        <div className="p-4">
+          {/* LOGOUT */}
           <button
             onClick={handleLogout}
-            className="w-full bg-[#A52A2A] hover:bg-[#8B1E1E] py-2 rounded-lg transition"
+            className="w-full bg-[#7B1D3F] hover:bg-[#98234c] text-white py-3 rounded-2xl font-semibold transition-all shadow-sm hover:shadow-md cursor-pointer"
           >
             Logout
           </button>
         </div>
-
       </aside>
 
       {/* CONTENT */}
-      <main className="flex-1 p-6 overflow-y-auto">
-        <Outlet />
-      </main>
+      <main className="flex-1 overflow-y-auto">
 
+        <div className="p-7">
+          <Outlet />
+        </div>
+
+      </main>
     </div>
   );
 }
+
+// ==========================================
+// CREATED BY FATIH MUBAROK
+// ==========================================
