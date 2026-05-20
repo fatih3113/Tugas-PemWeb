@@ -33,6 +33,9 @@ import MainLayout from "./layout/MainLayout";
 import AuthLayout from "./layout/AuthLayout";
 import DashboardLayout from "./layout/DashboardLayout";
 
+import Biodata from "./pages/dashboard/Biodata";
+
+
 // route
 import ProtectedRoute from "./route/ProtectedRoute";
 
@@ -79,6 +82,9 @@ function App() {
             <Route path="/dashboard/category/edit/:id" element={<CategoryEdit />} />
             <Route path="/dashboard/pembicara/edit/:id" element={<PembicaraEdit />} />
             <Route path="/dashboard/event/edit/:id" element={<EventEdit />} />
+
+            <Route path="/dashboard/biodata" element={<Biodata />} />
+            <Route path="/dashboard/biodata" element={<Biodata />} />
 
           </Route>
         </Route>
