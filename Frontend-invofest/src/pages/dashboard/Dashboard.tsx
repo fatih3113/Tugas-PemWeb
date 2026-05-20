@@ -6,8 +6,6 @@
 // src/pages/dashboard/index.tsx
 
 import { useEffect, useState } from "react";
-import { useAuthStore } from "../../store/useAuthStore";
-import { Link } from "react-router-dom";
 import axios from "axios";
 
 type Stat = {
