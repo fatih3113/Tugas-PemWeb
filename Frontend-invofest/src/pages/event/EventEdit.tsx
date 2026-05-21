@@ -22,6 +22,9 @@ export default function EventEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
+  
+  // Ambil base URL dari environment variable Vercel/Vite
+  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
   const {
     register,
@@ -32,13 +35,13 @@ export default function EventEdit() {
     resolver: zodResolver(schema),
   });
 
-  // Fetch kategori & data event by ID
+  // Fetch kategori & data event by ID menggunakan prefix /api
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [catRes, eventRes] = await Promise.all([
-          axios.get("http://localhost:3000/categories"),
-          axios.get(`http://localhost:3000/events/${id}`),
+          axios.get(`${baseUrl}/api/categories`),
+          axios.get(`${baseUrl}/api/events/${id}`),
         ]);
 
         setCategories(catRes.data.data);
@@ -51,17 +54,18 @@ export default function EventEdit() {
           location: e.location,
           description: e.description,
         });
-      } catch {
-        alert("Gagal mengambil data.");
+      } catch (error: any) {
+        console.error(error);
+        alert("Gagal mengambil data event.");
       }
     };
 
     fetchData();
-  }, [id]);
+  }, [id, baseUrl, reset]);
 
   const onSubmit = async (data: FormData) => {
     try {
-      await axios.put(`http://localhost:3000/events/${id}`, {
+      await axios.put(`${baseUrl}/api/events/${id}`, {
         name: data.name,
         categoryId: Number(data.categoryId),
         location: data.location,
@@ -76,66 +80,76 @@ export default function EventEdit() {
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 border rounded-xl shadow">
-      <h1 className="text-2xl font-bold mb-4">Edit Event</h1>
+    <div className="max-w-xl mx-auto mt-10 p-6 bg-white border border-gray-100 rounded-2xl shadow-sm">
+      <h1 className="text-2xl font-bold text-[#1a0a10] mb-4">Edit Event</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <input
-          {...register("name")}
-          placeholder="Nama Event"
-          className="border p-2 rounded"
-        />
-        {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Nama Event</label>
+          <input
+            {...register("name")}
+            placeholder="Nama Event"
+            className="w-full border p-2.5 rounded-xl text-sm focus:outline-none focus:border-[#7B1D3F]"
+          />
+          {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+        </div>
 
-        <select {...register("categoryId")} className="border p-2 rounded">
-          <option value="">Pilih Kategori</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.nama}
-            </option>
-          ))}
-        </select>
-        {errors.categoryId && (
-          <p className="text-red-500">{errors.categoryId.message}</p>
-        )}
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Kategori</label>
+          <select {...register("categoryId")} className="w-full border p-2.5 rounded-xl text-sm focus:outline-none focus:border-[#7B1D3F] bg-white">
+            <option value="">Pilih Kategori</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.nama}
+              </option>
+            ))}
+          </select>
+          {errors.categoryId && <p className="text-red-500 text-xs mt-1">{errors.categoryId.message}</p>}
+        </div>
 
-        <input
-          type="date"
-          {...register("date")}
-          className="border p-2 rounded"
-        />
-        {errors.date && <p className="text-red-500">{errors.date.message}</p>}
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Tanggal</label>
+          <input
+            type="date"
+            {...register("date")}
+            className="w-full border p-2.5 rounded-xl text-sm focus:outline-none focus:border-[#7B1D3F]"
+          />
+          {errors.date && <p className="text-red-500 text-xs mt-1">{errors.date.message}</p>}
+        </div>
 
-        <input
-          {...register("location")}
-          placeholder="Lokasi Event"
-          className="border p-2 rounded"
-        />
-        {errors.location && (
-          <p className="text-red-500">{errors.location.message}</p>
-        )}
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Lokasi</label>
+          <input
+            {...register("location")}
+            placeholder="Lokasi Event"
+            className="w-full border p-2.5 rounded-xl text-sm focus:outline-none focus:border-[#7B1D3F]"
+          />
+          {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location.message}</p>}
+        </div>
 
-        <textarea
-          {...register("description")}
-          placeholder="Deskripsi Event"
-          className="border p-2 rounded"
-        />
-        {errors.description && (
-          <p className="text-red-500">{errors.description.message}</p>
-        )}
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Deskripsi</label>
+          <textarea
+            {...register("description")}
+            placeholder="Deskripsi Event"
+            rows={4}
+            className="w-full border p-2.5 rounded-xl text-sm focus:outline-none focus:border-[#7B1D3F] resize-none"
+          />
+          {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
+        </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 pt-2">
           <button
             type="button"
             onClick={() => navigate("/dashboard/event")}
-            className="flex-1 border border-gray-300 text-gray-600 py-2 rounded hover:bg-gray-50 transition"
+            className="flex-1 border border-gray-200 text-gray-500 font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition text-sm"
           >
             Batal
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 bg-[#7B1D3F] text-white py-2 rounded hover:bg-[#9e2550] transition disabled:opacity-50"
+            className="flex-1 bg-[#7B1D3F] text-white py-2.5 rounded-xl hover:bg-[#9e2550] transition text-sm disabled:opacity-50"
           >
             {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
           </button>
@@ -143,5 +157,4 @@ export default function EventEdit() {
       </form>
     </div>
   );
-  //by fatih
 }

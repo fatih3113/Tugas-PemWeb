@@ -24,6 +24,9 @@ export default function EventCreate() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
   const [pembicara, setPembicara] = useState<Pembicara[]>([]);
+  
+  // Ambil base URL dari environment variable Vercel/Vite
+  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
   const {
     register,
@@ -36,19 +39,22 @@ export default function EventCreate() {
 
   useEffect(() => {
     Promise.all([
-      axios.get("http://localhost:3000/categories"),
-      axios.get("http://localhost:3000/pembicara"),
+      axios.get(`${baseUrl}/api/categories`),
+      axios.get(`${baseUrl}/api/pembicara`),
     ])
       .then(([catRes, spkRes]) => {
         setCategories(catRes.data.data);
         setPembicara(spkRes.data.data);
       })
-      .catch(() => alert("Gagal mengambil data."));
-  }, []);
+      .catch((error: any) => {
+        console.error(error);
+        alert("Gagal mengambil data kategori atau pembicara.");
+      });
+  }, [baseUrl]);
 
   const onSubmit = async (data: FormData) => {
     try {
-      await axios.post("http://localhost:3000/events", {
+      await axios.post(`${baseUrl}/api/events`, {
         name: data.name,
         categoryId: Number(data.categoryId),
         pembicaraId: Number(data.pembicaraId),
@@ -66,7 +72,6 @@ export default function EventCreate() {
 
   return (
     <div className="px-7 py-8 max-w-2xl mx-auto space-y-6">
-
       {/* HEADER */}
       <div>
         <div className="flex items-center gap-2 mb-1.5">
@@ -82,7 +87,6 @@ export default function EventCreate() {
       {/* FORM */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-
           {/* Nama */}
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1.5">Nama Event</label>
@@ -175,7 +179,6 @@ export default function EventCreate() {
               {isSubmitting ? "Menyimpan..." : "Simpan Event"}
             </button>
           </div>
-
         </form>
       </div>
     </div>
