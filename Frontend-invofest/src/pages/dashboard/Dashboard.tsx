@@ -84,10 +84,13 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchAll = async () => {
       try {
+        // Ambil base URL dari environment variable Vite
+        const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
         const [catRes, eventRes, speakerRes] = await Promise.all([
-          axios.get("http://localhost:3000/categories"),
-          axios.get("http://localhost:3000/events"),
-          axios.get("http://localhost:3000/pembicara"),
+          axios.get(`${baseUrl}/categories`),
+          axios.get(`${baseUrl}/events`),
+          axios.get(`${baseUrl}/pembicara`),
         ]);
 
         const categories = catRes.data.data;
@@ -103,7 +106,8 @@ export default function Dashboard() {
         setLatestEvents(events.slice(0, 4));
         setLatestSpeakers(speakers.slice(0, 4));
 
-      } catch {
+      } catch (error) {
+        console.error(error);
         alert("Gagal mengambil data dashboard.");
       }
     };
