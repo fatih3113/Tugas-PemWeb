@@ -3,8 +3,6 @@
 // CLEAN MODERN DASHBOARD UI
 // ==========================================
 
-// src/pages/dashboard/index.tsx
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -32,17 +30,14 @@ function StatCard({ stat }: { stat: Stat }) {
   return (
     <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all">
       <div className="flex justify-between items-start">
-
         <div>
           <p className="text-xs uppercase tracking-widest text-gray-400 font-semibold">
             {stat.title}
           </p>
-
           <h2 className="text-4xl font-black text-[#1a0a10] mt-3">
             {stat.value}
           </h2>
         </div>
-
         <div className="w-14 h-14 rounded-2xl bg-[#7B1D3F] text-white flex items-center justify-center text-2xl shadow-sm">
           {stat.icon}
         </div>
@@ -63,7 +58,6 @@ function SectionHeader({
       <h2 className="text-xl font-bold text-[#1a0a10]">
         {title}
       </h2>
-
       <p className="text-sm text-gray-400 mt-1">
         {subtitle}
       </p>
@@ -84,13 +78,14 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        // Ambil base URL dari environment variable Vite
+        // Mengambil base URL dari environment variable Vite atau fallback ke localhost
         const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+        // Mengambil data dengan menyertakan jalur /api sesuai rute baru di backend
         const [catRes, eventRes, speakerRes] = await Promise.all([
-          axios.get(`${baseUrl}/categories`),
-          axios.get(`${baseUrl}/events`),
-          axios.get(`${baseUrl}/pembicara`),
+          axios.get(`${baseUrl}/api/categories`),
+          axios.get(`${baseUrl}/api/events`),
+          axios.get(`${baseUrl}/api/pembicara`),
         ]);
 
         const categories = catRes.data.data;
@@ -106,9 +101,10 @@ export default function Dashboard() {
         setLatestEvents(events.slice(0, 4));
         setLatestSpeakers(speakers.slice(0, 4));
 
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
-        alert("Gagal mengambil data dashboard.");
+        // Menampilkan pesan error spesifik dari server atau sistem browser
+        alert("Eror: " + (error.response?.data?.message || error.message));
       }
     };
 
@@ -117,10 +113,8 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#f7f8fc] px-7 py-8">
-
       {/* HERO */}
       <div className="relative overflow-hidden rounded-3xl bg-white border border-gray-100 p-8 shadow-sm mb-8">
-
         <div className="absolute top-0 right-0 w-52 h-52 bg-rose-50 rounded-full blur-3xl opacity-70" />
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-gray-100 rounded-full blur-3xl opacity-60" />
 
@@ -129,11 +123,9 @@ export default function Dashboard() {
             <span className="w-2 h-2 rounded-full bg-[#7B1D3F]" />
             Dashboard
           </span>
-
           <h1 className="text-4xl font-black text-[#1a0a10] mt-3 tracking-tight">
             Invofest Dashboard
           </h1>
-
           <p className="text-sm text-gray-400 mt-3 max-w-xl leading-relaxed">
             Pantau statistik event, kategori, dan pembicara terbaru
             dengan tampilan dashboard modern dan profesional.
@@ -150,33 +142,26 @@ export default function Dashboard() {
 
       {/* CONTENT */}
       <div className="grid lg:grid-cols-2 gap-6">
-
         {/* EVENT */}
         <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
-
           <SectionHeader
             title="Event Terbaru"
             subtitle="Daftar event terbaru Invofest"
           />
-
           <div className="space-y-4">
             {latestEvents.map((item, index) => (
               <div
                 key={item.id}
                 className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all"
               >
-
                 <div className="flex items-center gap-4">
-
                   <div className="w-12 h-12 rounded-2xl bg-[#7B1D3F] text-white flex items-center justify-center font-bold shadow-sm">
                     {index + 1}
                   </div>
-
                   <div>
                     <h3 className="font-bold text-[#1a0a10]">
                       {item.name}
                     </h3>
-
                     <p className="text-xs text-gray-400 mt-1">
                       {new Date(item.dateEvent).toLocaleDateString(
                         "id-ID",
@@ -189,7 +174,6 @@ export default function Dashboard() {
                     </p>
                   </div>
                 </div>
-
                 <span className="text-xs font-semibold bg-rose-50 border border-rose-100 text-[#7B1D3F] px-3 py-1 rounded-full">
                   {item.category.nama}
                 </span>
@@ -200,15 +184,12 @@ export default function Dashboard() {
 
         {/* SPEAKER */}
         <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
-
           <SectionHeader
             title="Pembicara Terbaru"
             subtitle="Pembicara terbaru yang bergabung"
           />
-
           <div className="space-y-4">
             {latestSpeakers.map((item) => {
-
               const initials = item.name
                 .split(" ")
                 .map((n) => n[0])
@@ -221,9 +202,7 @@ export default function Dashboard() {
                   key={item.id}
                   className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all"
                 >
-
                   <div className="flex items-center gap-4">
-
                     {item.photo ? (
                       <img
                         src={item.photo}
@@ -235,18 +214,15 @@ export default function Dashboard() {
                         {initials}
                       </div>
                     )}
-
                     <div>
                       <h3 className="font-bold text-[#1a0a10]">
                         {item.name}
                       </h3>
-
                       <p className="text-xs text-gray-400 mt-1">
                         {item.role}
                       </p>
                     </div>
                   </div>
-
                   <div className="w-3 h-3 rounded-full bg-green-400" />
                 </div>
               );
@@ -257,7 +233,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
-// ==========================================
-// CREATED BY FATIH MUBAROK
-// ==========================================

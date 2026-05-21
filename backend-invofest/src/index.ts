@@ -11,14 +11,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Konfigurasi CORS menggunakan wildcard (*) agar aman diakses dari domain vercel manapun saat testing
 app.use(
   cors({
-    origin: [
-      "https://frontend-invofest.vercel.app",
-      "http://localhost:5173",
-    ],
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
   })
 );
 
@@ -28,9 +25,10 @@ app.get("/", (req, res) => {
   res.send("Selamat datang di API Invofest!");
 });
 
-app.use("/events", eventRoutes);
-app.use("/categories", categoryRoutes);
-app.use("/pembicara", pembicaraRoutes);
+// Menambahkan prefix /api agar serasi dengan pemanggilan di frontend
+app.use("/api/events", eventRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/pembicara", pembicaraRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server berjalan di port ${PORT}`);
