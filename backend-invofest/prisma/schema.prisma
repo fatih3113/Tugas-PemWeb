@@ -1,6 +1,5 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -16,10 +15,10 @@ model Event {
   description String
   createdAt   DateTime  @default(now()) @map("created_at")
   categoryId  Int       @map("category_id")
-  pembicaraId Int?      @map("pembicara_id")
 
-  category  Category   @relation(fields: [categoryId], references: [id])
-  pembicara Pembicara? @relation(fields: [pembicaraId], references: [id])
+  pembicaraId Int?      @map("pembicara_id")
+  category    Category  @relation(fields: [categoryId], references: [id])
+  pembicara   Pembicara? @relation(fields: [pembicaraId], references: [id])
 
   @@map("events")
 }
@@ -38,7 +37,7 @@ model Pembicara {
   role   String
   email  String  @unique
   photo  String
-  events Event[]
+  events Event[]  // ← tambah
 
   @@map("pembicara")
 }
