@@ -1,5 +1,3 @@
-// src/pages/User/UserEdit.tsx
-
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -15,7 +13,7 @@ const schema = z.object({
     .refine((val) => !val || val.length >= 6, {
       message: "Password minimal 6 karakter",
     }),
-  foto: z.string().or(z.literal("")).optional(),
+  foto: z.string().url("URL foto tidak valid").or(z.literal("")).optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -32,30 +30,36 @@ export default function UserEdit() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      username: "",
+      password: "",
+      foto: "",
+    },
   });
 
   useEffect(() => {
+    if (!id) return;
     axios
       .get(`${baseUrl}/api/users/${id}`)
       .then((res) => {
         if (res.data?.data) {
           reset({
-            username: res.data.data.username,
+            username: res.data.data.username || "",
             password: "",
             foto: res.data.data.foto || "",
           });
         }
       })
       .catch(() => alert("Gagal mengambil data user."));
-  }, [id]);
+  }, [id, reset, baseUrl]);
 
   const onSubmit = async (data: FormData) => {
     try {
-      // Selalu kirim username & foto, password hanya jika diisi
       const payload: Record<string, string> = {
         username: data.username,
         foto: data.foto ?? "",
       };
+      
       if (data.password && data.password.trim() !== "") {
         payload.password = data.password;
       }
@@ -70,11 +74,11 @@ export default function UserEdit() {
 
   return (
     <div className="min-h-screen bg-[#f7f8fc] px-7 py-8">
-
       {/* HERO */}
       <div className="relative overflow-hidden rounded-3xl bg-white border border-gray-100 p-8 shadow-sm mb-7">
         <div className="absolute top-0 right-0 w-52 h-52 bg-rose-50 rounded-full blur-3xl opacity-70" />
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-gray-100 rounded-full blur-3xl opacity-60" />
+
         <div className="relative z-10">
           <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase text-[#7B1D3F]">
             <span className="w-2 h-2 rounded-full bg-[#7B1D3F]" />
@@ -92,7 +96,6 @@ export default function UserEdit() {
       {/* FORM */}
       <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 max-w-2xl">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-
           {/* Username */}
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
@@ -109,33 +112,10 @@ export default function UserEdit() {
             )}
           </div>
 
-          {/* Foto */}
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-              URL Foto{" "}
-              <span className="text-gray-300 normal-case font-normal">(opsional)</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Contoh: https://example.com/foto.jpg"
-              {...register("foto")}
-              className="w-full border border-gray-200 px-4 py-3 rounded-2xl text-sm focus:outline-none focus:border-[#7B1D3F] focus:ring-1 focus:ring-[#7B1D3F] transition"
-            />
-            <p className="text-[11px] text-gray-400 mt-1">
-              Gunakan link URL gambar, bukan upload file langsung.
-            </p>
-            {errors.foto && (
-              <p className="text-red-500 text-xs mt-1.5">{errors.foto.message}</p>
-            )}
-          </div>
-
           {/* Password */}
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-              Password Baru{" "}
-              <span className="text-gray-300 normal-case font-normal">
-                (kosongkan jika tidak diubah)
-              </span>
+              Password Baru <span className="text-gray-300 normal-case font-normal">(kosongkan jika tidak diubah)</span>
             </label>
             <input
               type="password"
@@ -145,6 +125,22 @@ export default function UserEdit() {
             />
             {errors.password && (
               <p className="text-red-500 text-xs mt-1.5">{errors.password.message}</p>
+            )}
+          </div>
+
+          {/* Foto */}
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+              URL Foto <span className="text-gray-300 normal-case font-normal">(opsional)</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Contoh: https://example.com/foto.jpg"
+              {...register("foto")}
+              className="w-full border border-gray-200 px-4 py-3 rounded-2xl text-sm focus:outline-none focus:border-[#7B1D3F] focus:ring-1 focus:ring-[#7B1D3F] transition"
+            />
+            {errors.foto && (
+              <p className="text-red-500 text-xs mt-1.5">{errors.foto.message}</p>
             )}
           </div>
 

@@ -26,6 +26,7 @@ export default function DashboardLayout() {
     { name: "Category Event", path: "/dashboard/category", icon: "🗂️" },
     { name: "Event", path: "/dashboard/event", icon: "📅" },
     { name: "Pembicara", path: "/dashboard/pembicara", icon: "🎤" },
+    { name: "User", path: "/dashboard/user", icon: "👤" }, // ← tambah ini
   ];
 
   return (

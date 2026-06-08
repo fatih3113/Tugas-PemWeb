@@ -23,7 +23,10 @@ export const getAllEvents = async (req: Request, res: Response) => {
         ...(description && { description: { contains: description, mode: "insensitive" } }),
       },
       orderBy: { createdAt: "desc" },
-      include: { category: true },
+      include: {
+        category: true,
+        pembicara: true, // FIX: tambah include pembicara
+      },
     });
 
     return res.status(200).json({
@@ -52,7 +55,10 @@ export const getEventById = async (
   try {
     const event = await prisma.event.findUnique({
       where: { id },
-      include: { category: true },
+      include: {
+        category: true,
+        pembicara: true, // FIX: tambah include pembicara
+      },
     });
 
     if (!event) {
@@ -74,15 +80,17 @@ export const getEventById = async (
 // 3. CREATE
 export const createEvent = async (req: Request, res: Response) => {
   try {
-    const { name, categoryId, location, dateEvent, description } = req.body as {
+    const { name, categoryId, pembicaraId, location, dateEvent, description } = req.body as {
       name?: string;
       categoryId?: number;
+      pembicaraId?: number; // FIX: tambah pembicaraId
       location?: string;
       dateEvent?: string;
       description?: string;
     };
 
-    if (!name || !categoryId || !location || !dateEvent || !description) {
+    // FIX: tambah pembicaraId ke validasi wajib
+    if (!name || !categoryId || !pembicaraId || !location || !dateEvent || !description) {
       return res.status(400).json({ message: "Semua field wajib diisi." });
     }
 
@@ -90,11 +98,15 @@ export const createEvent = async (req: Request, res: Response) => {
       data: {
         name,
         categoryId,
+        pembicaraId, // FIX: simpan pembicaraId ke database
         location,
         dateEvent: new Date(dateEvent),
         description,
       },
-      include: { category: true },
+      include: {
+        category: true,
+        pembicara: true, // FIX: tambah include pembicara
+      },
     });
 
     return res.status(201).json({
@@ -103,7 +115,7 @@ export const createEvent = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     if (error.code === "P2003") {
-      return res.status(404).json({ message: "Category tidak ditemukan." });
+      return res.status(404).json({ message: "Category atau Pembicara tidak ditemukan." });
     }
     return res.status(500).json({
       message: "Gagal membuat event.",
@@ -124,9 +136,10 @@ export const updateEvent = async (
   }
 
   try {
-    const { name, categoryId, location, dateEvent, description } = req.body as {
+    const { name, categoryId, pembicaraId, location, dateEvent, description } = req.body as {
       name?: string;
       categoryId?: number;
+      pembicaraId?: number; // FIX: tambah pembicaraId
       location?: string;
       dateEvent?: string;
       description?: string;
@@ -137,11 +150,15 @@ export const updateEvent = async (
       data: {
         ...(name !== undefined && { name }),
         ...(categoryId !== undefined && { categoryId }),
+        ...(pembicaraId !== undefined && { pembicaraId }), // FIX: update pembicaraId
         ...(location !== undefined && { location }),
         ...(dateEvent !== undefined && { dateEvent: new Date(dateEvent) }),
         ...(description !== undefined && { description }),
       },
-      include: { category: true },
+      include: {
+        category: true,
+        pembicara: true, // FIX: tambah include pembicara
+      },
     });
 
     return res.status(200).json({
@@ -153,7 +170,7 @@ export const updateEvent = async (
       return res.status(404).json({ message: "Event tidak ditemukan." });
     }
     if (error.code === "P2003") {
-      return res.status(404).json({ message: "Category tidak ditemukan." });
+      return res.status(404).json({ message: "Category atau Pembicara tidak ditemukan." });
     }
     return res.status(500).json({
       message: "Gagal memperbarui event.",
@@ -191,5 +208,5 @@ export const deleteEvent = async (
       error: error instanceof Error ? error.message : error,
     });
   }
-//by fatih
+  //by fatih
 };

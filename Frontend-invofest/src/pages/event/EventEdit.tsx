@@ -10,6 +10,7 @@ import axios from "axios";
 const schema = z.object({
   name: z.string().min(3, "Nama event minimal 3 karakter"),
   categoryId: z.string().min(1, "Kategori wajib dipilih"),
+  pembicaraId: z.string().min(1, "Pembicara wajib dipilih"),
   date: z.string().min(1, "Tanggal wajib diisi"),
   location: z.string().min(3, "Lokasi minimal 3 karakter"),
   description: z.string().min(5, "Deskripsi minimal 5 karakter"),

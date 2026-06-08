@@ -1,5 +1,4 @@
 // src/controllers/categoryController.ts
-
 import type { Request, Response } from "express";
 import { prisma } from "../lib/db.js";
 
@@ -14,6 +13,7 @@ export const getAllCategories = async (req: Request, res: Response) => {
       message: "Berhasil mengambil data kategori.",
       data: categories,
     });
+
   } catch (error) {
     return res.status(500).json({
       message: "Gagal mengambil data kategori.",
@@ -46,6 +46,7 @@ export const getCategoryById = async (
       message: "Berhasil mengambil data kategori.",
       data: category,
     });
+
   } catch (error) {
     return res.status(500).json({
       message: "Gagal mengambil data kategori.",
@@ -71,6 +72,7 @@ export const createCategory = async (req: Request, res: Response) => {
       message: "Berhasil membuat kategori.",
       data: newCategory,
     });
+
   } catch (error) {
     return res.status(500).json({
       message: "Gagal membuat kategori.",
@@ -104,6 +106,7 @@ export const updateCategory = async (
       message: "Berhasil memperbarui kategori.",
       data: updatedCategory,
     });
+    
   } catch (error: any) {
     if (error.code === "P2025") {
       return res.status(404).json({ message: "Category tidak ditemukan." });

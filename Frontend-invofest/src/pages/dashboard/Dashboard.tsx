@@ -26,6 +26,12 @@ type SpeakerItem = {
   photo: string;
 };
 
+type UserItem = {
+  id: number;
+  username: string;
+  foto: string;
+};
+
 function StatCard({ stat }: { stat: Stat }) {
   return (
     <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all">
@@ -70,40 +76,44 @@ export default function Dashboard() {
     { title: "Kategori", value: 0, icon: "🗂️" },
     { title: "Event", value: 0, icon: "📅" },
     { title: "Pembicara", value: 0, icon: "🎤" },
+    { title: "User", value: 0, icon: "👤" },
   ]);
 
   const [latestEvents, setLatestEvents] = useState<EventItem[]>([]);
   const [latestSpeakers, setLatestSpeakers] = useState<SpeakerItem[]>([]);
+  const [latestUsers, setLatestUsers] = useState<UserItem[]>([]);
 
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        // Mengambil base URL dari environment variable Vite atau fallback ke localhost
         const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-        // Mengambil data dengan menyertakan jalur /api sesuai rute baru di backend
-        const [catRes, eventRes, speakerRes] = await Promise.all([
+        // Mengambil data dari seluruh endpoint secara paralel termasuk users
+        const [catRes, eventRes, speakerRes, userRes] = await Promise.all([
           axios.get(`${baseUrl}/api/categories`),
           axios.get(`${baseUrl}/api/events`),
           axios.get(`${baseUrl}/api/pembicara`),
+          axios.get(`${baseUrl}/api/users`),
         ]);
 
-        const categories = catRes.data.data;
-        const events = eventRes.data.data;
-        const speakers = speakerRes.data.data;
+        const categories = catRes.data.data || [];
+        const events = eventRes.data.data || [];
+        const speakers = speakerRes.data.data || [];
+        const users = userRes.data.data || [];
 
         setStats([
           { title: "Kategori", value: categories.length, icon: "🗂️" },
           { title: "Event", value: events.length, icon: "📅" },
           { title: "Pembicara", value: speakers.length, icon: "🎤" },
+          { title: "User", value: users.length, icon: "👤" },
         ]);
 
         setLatestEvents(events.slice(0, 4));
         setLatestSpeakers(speakers.slice(0, 4));
+        setLatestUsers(users.slice(0, 4));
 
       } catch (error: any) {
         console.error(error);
-        // Menampilkan pesan error spesifik dari server atau sistem browser
         alert("Eror: " + (error.response?.data?.message || error.message));
       }
     };
@@ -127,21 +137,21 @@ export default function Dashboard() {
             Invofest Dashboard
           </h1>
           <p className="text-sm text-gray-400 mt-3 max-w-xl leading-relaxed">
-            Pantau statistik event, kategori, dan pembicara terbaru
+            Pantau statistik event, kategori, pembicara, dan pengguna terbaru
             dengan tampilan dashboard modern dan profesional.
           </p>
         </div>
       </div>
 
       {/* STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {stats.map((stat) => (
           <StatCard key={stat.title} stat={stat} />
         ))}
       </div>
 
-      {/* CONTENT */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      {/* CONTENT ROW 1: EVENT & SPEAKER */}
+      <div className="grid lg:grid-cols-2 gap-6 mb-6">
         {/* EVENT */}
         <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
           <SectionHeader
@@ -175,7 +185,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <span className="text-xs font-semibold bg-rose-50 border border-rose-100 text-[#7B1D3F] px-3 py-1 rounded-full">
-                  {item.category.nama}
+                  {item.category?.nama || "Umum"}
                 </span>
               </div>
             ))}
@@ -191,11 +201,8 @@ export default function Dashboard() {
           <div className="space-y-4">
             {latestSpeakers.map((item) => {
               const initials = item.name
-                .split(" ")
-                .map((n) => n[0])
-                .slice(0, 2)
-                .join("")
-                .toUpperCase();
+                ? item.name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
+                : "SP";
 
               return (
                 <div
@@ -224,6 +231,64 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="w-3 h-3 rounded-full bg-green-400" />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* CONTENT ROW 2: USER LATEST */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* USER */}
+        <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
+          <SectionHeader
+            title="User Terbaru"
+            subtitle="Pengguna administrator sistem terdaftar"
+          />
+          <div className="space-y-4">
+            {latestUsers.map((item, index) => {
+              const userInitials = item.username
+                ? item.username.slice(0, 2).toUpperCase()
+                : "US";
+
+              const colorVariants = [
+                "bg-indigo-600",
+                "bg-emerald-600",
+                "bg-amber-600",
+                "bg-sky-600",
+              ];
+              const randomColor = colorVariants[index % colorVariants.length];
+
+              return (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all"
+                >
+                  <div className="flex items-center gap-4">
+                    {item.foto ? (
+                      <img
+                        src={item.foto}
+                        alt={item.username}
+                        className="w-12 h-12 rounded-2xl object-cover shadow-sm"
+                      />
+                    ) : (
+                      <div className={`w-12 h-12 rounded-2xl ${randomColor} text-white flex items-center justify-center font-bold shadow-sm`}>
+                        {userInitials}
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="font-bold text-[#1a0a10]">
+                        {item.username}
+                      </h3>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Sistem Administrator
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-300">
+                    ID: {String(item.id).padStart(2, "0")}
+                  </span>
                 </div>
               );
             })}

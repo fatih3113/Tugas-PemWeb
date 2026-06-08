@@ -38,6 +38,9 @@ import Biodata from "./pages/dashboard/Biodata";
 
 // route
 import ProtectedRoute from "./route/ProtectedRoute";
+import UserCreate from "./pages/user/UsersCreate";
+import UserEdit from "./pages/user/UsersEdit";
+import UserIndex from "./pages/user/UsersIndex";
 
 function App() {
   return (
@@ -85,6 +88,11 @@ function App() {
 
             <Route path="/dashboard/biodata" element={<Biodata />} />
             <Route path="/dashboard/biodata" element={<Biodata />} />
+
+               {/* Untuk Users */}
+            <Route path="/dashboard/user" element={<UserIndex />} />
+            <Route path="/dashboard/user/create" element={<UserCreate />} />
+            <Route path="/dashboard/user/edit/:id" element={<UserEdit />} />
 
           </Route>
         </Route>
